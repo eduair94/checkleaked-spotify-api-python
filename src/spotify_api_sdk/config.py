@@ -12,7 +12,7 @@ RAPIDAPI_BASE_URL = "https://spotify81.p.rapidapi.com"
 RAPIDAPI_HOST = "spotify81.p.rapidapi.com"
 PROXY_BASE_URL = "https://spotify-proxy.checkleaked.cc/spotify-data"
 DEFAULT_USER_AGENT = (
-    "checkleaked-spotify-api-python/2.1.0 "
+    "checkleaked-spotify-api-python/2.1.1 "
     "(+https://pypi.org/project/checkleaked-spotify-api/)"
 )
 # Longest wait before a retry, even when the API's Retry-After asks for more.

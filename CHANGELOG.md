@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1 - 2026-11-01
+
+Documentation only: the README links the Spotify Data MCP server.
+
 ## 2.1.0 - 2026-11-01
 
 Matches `@checkleaked/spotify-api` 2.1.0.

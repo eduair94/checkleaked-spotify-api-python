@@ -26,6 +26,9 @@ This is a data API client. It does not require Spotify OAuth credentials.
 [Spotify lyrics API](https://spotify.checkleaked.cc/spotify-lyrics-api) ·
 [Spotify Web API alternative](https://spotify.checkleaked.cc/spotify-web-api-alternative)
 
+**Use it from an AI assistant:** the [Spotify Data MCP server](https://github.com/eduair94/spotify-data-mcp)
+puts play counts, monthly listeners, charts and catalog lookups into Claude, Cursor and VS Code.
+
 ## Install
 
 ```bash
