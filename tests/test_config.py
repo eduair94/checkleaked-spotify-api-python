@@ -51,3 +51,19 @@ def test_missing_key_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
     with pytest.raises(ValidationError):
         SpotifyApiClient(session=FakeSession())
 
+
+def test_retry_wait_cap_and_504_retries_default_and_are_configurable() -> None:
+    config = resolve_config("key", session=FakeSession())
+    assert config.max_retry_delay_s == 10.0
+    assert config.gateway_timeout_retries == 1
+    custom = SpotifyApiClient(
+        "key",
+        session=FakeSession(),
+        max_retry_delay=2.5,
+        gateway_timeout_retries=0,
+    ).config
+    assert custom.max_retry_delay_s == 2.5
+    assert custom.gateway_timeout_retries == 0
+    with pytest.raises(ValidationError):
+        resolve_config("key", max_retry_delay=-1, session=FakeSession())
+

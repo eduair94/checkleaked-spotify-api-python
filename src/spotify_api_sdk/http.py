@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -13,6 +14,7 @@ from urllib.parse import urlencode, urlsplit, urlunsplit
 
 from .config import ResolvedConfig
 from .errors import (
+    NON_RETRYABLE_CODES,
     AuthError,
     HttpError,
     NetworkError,
@@ -23,7 +25,7 @@ from .errors import (
 from .ids import normalize_id, normalize_ids
 from .types import Headers, QueryParams, SuccessEnvelope
 
-_ID_SINGLE_KEYS = {"id", "spotify_track_id"}
+_ID_SINGLE_KEYS = {"id", "spotify_track_id", "spotifyId"}
 _ID_MULTI_KEYS = {"ids", "seed_tracks", "seed_artists"}
 
 
@@ -93,11 +95,90 @@ def _message(body: Any, fallback: str) -> str:
 
 
 def _code(body: Any) -> Optional[str]:
+    # The machine-readable ``code`` wins; older endpoints only send an
+    # ``error`` string. ``error: true`` is a flag, not a code.
     if isinstance(body, dict):
         for key in ("code", "error"):
             value = body.get(key)
+            if isinstance(value, bool):
+                continue
             if isinstance(value, (str, int)):
                 return str(value)
+    return None
+
+
+_ERROR_CODE_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
+# RapidAPI's gateway answers 429 with only a message.
+_MONTHLY_QUOTA_RE = re.compile(r"monthly quota", re.IGNORECASE)
+
+
+def _is_error_body(body: Any) -> bool:
+    """True for a 2xx body that reports a failure.
+
+    ``success: false``, ``error: true``, or an UPPER_SNAKE error ``code``
+    (e.g. ``200 {"error": true, "code": "LYRICS_NOT_AVAILABLE"}``).
+    """
+
+    if not isinstance(body, dict):
+        return False
+    if body.get("success") is False or body.get("error") is True:
+        return True
+    code = body.get("code")
+    return (
+        body.get("success") is not True
+        and isinstance(code, str)
+        and bool(_ERROR_CODE_RE.match(code))
+    )
+
+
+def _is_gateway_timeout(status: int, body: Any) -> bool:
+    """A timeout answer: HTTP 504, HTTP 524, or a 5xx whose ``code`` is
+    ``UPSTREAM_TIMEOUT``.
+
+    524 is Cloudflare's "the origin did not answer in time" (about 100 s).
+    Since 2026-10 the API answers timeouts as 503 ``UPSTREAM_TIMEOUT``
+    (Cloudflare replaced 504 bodies with plain text), so the status alone
+    no longer tells.
+    """
+
+    if status in (504, 524):
+        return True
+    return (
+        status >= 500
+        and isinstance(body, dict)
+        and body.get("code") == "UPSTREAM_TIMEOUT"
+    )
+
+
+def _worth_retrying(body: Any) -> bool:
+    """False when the error body says waiting cannot fix it."""
+
+    if not isinstance(body, dict):
+        return True
+    if body.get("retryable") is False:
+        return False
+    if body.get("code") in NON_RETRYABLE_CODES:
+        return False
+    return not _MONTHLY_QUOTA_RE.search(_message(body, ""))
+
+
+def _rate_limit_code(status: int, body: Any) -> Optional[str]:
+    if status != 429:
+        return None
+    if _MONTHLY_QUOTA_RE.search(_message(body, "")):
+        return "QUOTA_EXCEEDED"
+    return "RATE_LIMITED"
+
+
+def _body_retry_after_ms(body: Any) -> Optional[int]:
+    if isinstance(body, dict):
+        seconds = body.get("retry_after_s")
+        if (
+            isinstance(seconds, (int, float))
+            and not isinstance(seconds, bool)
+            and seconds >= 0
+        ):
+            return int(seconds * 1000)
     return None
 
 
@@ -150,7 +231,8 @@ class SpotifyHttpClient:
         )
         if isinstance(response.data, dict):
             data = response.data
-            if data.get("success") is False:
+            # Some endpoints report a failure inside a 2xx body.
+            if _is_error_body(data):
                 raise self._http_error(
                     response.status,
                     data,
@@ -288,6 +370,7 @@ class SpotifyHttpClient:
             self.config.debug(f"-> {method} {url}", None)
 
         last_error: Optional[SpotifyApiError] = None
+        gateway_timeout_retries = 0
         for attempt in range(max_retries + 1):
             started = time.monotonic()
             try:
@@ -323,8 +406,34 @@ class SpotifyHttpClient:
                     None,
                 )
 
-            if (status == 429 or status >= 500) and attempt < max_retries:
-                retry_after = _retry_after_ms(response_headers.get("retry-after"))
+            content = response.content or b""
+            decoded = _decode(
+                content,
+                response_headers.get("content-type", ""),
+            )
+            # Retry 429/5xx unless the body says waiting cannot help
+            # (exhausted quota, bad key, or ``retryable: false``). A timeout
+            # (504, 524, or 503 ``UPSTREAM_TIMEOUT``) already used the API's
+            # whole time budget, so it gets at most ``gateway_timeout_retries``
+            # of the retries.
+            timed_out = _is_gateway_timeout(status, decoded)
+            if (
+                (status == 429 or status >= 500)
+                and attempt < max_retries
+                and _worth_retrying(decoded)
+                and (
+                    not timed_out
+                    or gateway_timeout_retries
+                    < self.config.gateway_timeout_retries
+                )
+            ):
+                if timed_out:
+                    gateway_timeout_retries += 1
+                retry_after = _retry_after_ms(
+                    response_headers.get("retry-after")
+                )
+                if retry_after is None:
+                    retry_after = _body_retry_after_ms(decoded)
                 self._retry(
                     attempt,
                     method,
@@ -334,11 +443,6 @@ class SpotifyHttpClient:
                 )
                 continue
 
-            content = response.content or b""
-            decoded = _decode(
-                content,
-                response_headers.get("content-type", ""),
-            )
             if not 200 <= status < 300:
                 raise self._http_error(
                     status,
@@ -374,6 +478,9 @@ class SpotifyHttpClient:
                 0,
                 max(1, int(self.config.retry_delay_s * 1000)),
             )
+        # Never wait longer than max_retry_delay, whatever Retry-After says
+        # (the error still reports the requested wait in retry_after_ms).
+        delay_ms = min(delay_ms, int(self.config.max_retry_delay_s * 1000))
         info = {
             "attempt": attempt + 1,
             "method": method,
@@ -419,7 +526,18 @@ class SpotifyHttpClient:
         headers: Mapping[str, str],
     ) -> HttpError:
         message = _message(body, f"HTTP {status}")
-        code = _code(body)
+        code = _code(body) or _rate_limit_code(status, body)
+        request_id = headers.get("x-request-id")
+        if request_id is None and isinstance(body, dict):
+            body_request_id = body.get("request_id")
+            if isinstance(body_request_id, str):
+                request_id = body_request_id
+        retry_after_ms = _retry_after_ms(headers.get("retry-after"))
+        if retry_after_ms is None:
+            retry_after_ms = _body_retry_after_ms(body)
+        retryable: Optional[bool] = None
+        if isinstance(body, dict) and isinstance(body.get("retryable"), bool):
+            retryable = bool(body["retryable"])
         if status in (401, 403):
             return AuthError(
                 message,
@@ -427,6 +545,9 @@ class SpotifyHttpClient:
                 code=code,
                 body=body,
                 url=url,
+                request_id=request_id,
+                retry_after_ms=retry_after_ms,
+                retryable=retryable,
             )
         if status == 429:
             return RateLimitError(
@@ -435,7 +556,9 @@ class SpotifyHttpClient:
                 code=code,
                 body=body,
                 url=url,
-                retry_after_ms=_retry_after_ms(headers.get("retry-after")),
+                retry_after_ms=retry_after_ms,
+                request_id=request_id,
+                retryable=retryable,
             )
         return HttpError(
             message,
@@ -443,5 +566,8 @@ class SpotifyHttpClient:
             code=code,
             body=body,
             url=url,
+            request_id=request_id,
+            retry_after_ms=retry_after_ms,
+            retryable=retryable,
         )
 

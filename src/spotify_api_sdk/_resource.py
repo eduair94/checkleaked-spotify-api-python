@@ -10,6 +10,9 @@ from .errors import ValidationError
 from .ids import normalize_id
 from .types import Headers, QueryValue
 
+# JSON body fields that carry a single Spotify id (e.g. POST /tracking/track).
+_ID_BODY_FIELDS = frozenset({"spotifyId"})
+
 
 @dataclass(frozen=True)
 class Endpoint:
@@ -53,8 +56,14 @@ class Resource:
                 query[wire_name] = value
 
         body = values.get("body")
+        # Body fields skip the query-string id normalization, so reduce
+        # Spotify URIs/URLs to bare ids here.
         explicit_body = {
-            wire_name: values[python_name]
+            wire_name: (
+                normalize_id(values[python_name])
+                if wire_name in _ID_BODY_FIELDS
+                else values[python_name]
+            )
             for python_name, wire_name in endpoint.body_fields
             if values.get(python_name) is not None
         }

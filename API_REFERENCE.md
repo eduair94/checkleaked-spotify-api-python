@@ -21,20 +21,21 @@ Pythonic `snake_case` methods also expose their npm-compatible `camelCase` alias
 
 ## `albums`
 
-- `get(ids, contrast=None)` — GET `/albums`
+- `get(ids, market=None, contrast=None, include=None)` — GET `/albums`
 - `tracks(id, offset=None, limit=None)` — GET `/album_tracks`
 - `metadata(id, contrast=None)` — GET `/album_metadata`
 
 ## `analysis`
 
 - `artist_compare(ids)` (alias: `artistCompare`) — GET `/artist_compare`
-- `audio_features(id)` (alias: `audioFeatures`) — GET `/audio_features`
+- `audio_features(ids)` (alias: `audioFeatures`) — GET `/audio_features`
 - `playlist_analysis(id)` (alias: `playlistAnalysis`) — GET `/playlist_analysis`
 
 ## `artists`
 
-- `get(ids, contrast=None)` — GET `/artists`
-- `overview(id, contrast=None)` — GET `/artist_overview`
+- `get(ids, market=None, contrast=None, include=None)` — GET `/artists`
+- `insights(ids)` — GET `/artist_insights`
+- `overview(id, slim=None, contrast=None, include=None)` — GET `/artist_overview`
 - `discography_overview(id)` (alias: `discographyOverview`) — GET `/artist_discography_overview`
 - `albums(id, offset=None, limit=None)` — GET `/artist_albums`
 - `singles(id, offset=None, limit=None)` — GET `/artist_singles`
@@ -55,29 +56,24 @@ Pythonic `snake_case` methods also expose their npm-compatible `camelCase` alias
 - `album_metadata(ids)` (alias: `albumMetadata`) — GET `/album_metadata_batch`
 - `artist_overview(ids)` (alias: `artistOverview`) — GET `/artist_overview_batch`
 - `track_credits(ids)` (alias: `trackCredits`) — GET `/track_credits_batch`
-- `track_lyrics(ids, format=None)` (alias: `trackLyrics`) — GET `/track_lyrics_batch`
+- `track_lyrics(ids, format=None, vocal_removal=None)` (alias: `trackLyrics`) — GET `/track_lyrics_batch`
 - `track_popularity(ids)` (alias: `trackPopularity`) — GET `/track_popularity_batch`
 
 ## `browse`
 
 - `categories(country=None, locale=None, limit=None, offset=None)` — GET `/browse/categories`
-- `category(id, country=None, locale=None)` — GET `/browse/categories/{id}`
-- `featured_playlists(country=None, locale=None, limit=None, offset=None)` (alias: `featuredPlaylists`) — GET `/browse/featured-playlists`
+- `category(id, country=None, locale=None, section_limit=None, section_offset=None, item_limit=None, item_offset=None)` — GET `/browse/categories/{id}`
+- `featured_playlists(country=None, locale=None, timestamp=None, limit=None, offset=None)` (alias: `featuredPlaylists`) — GET `/browse/featured-playlists`
 - `new_releases(country=None, limit=None, offset=None)` (alias: `newReleases`) — GET `/browse/new-releases`
-- `recommendations(seed_tracks=None, seed_artists=None, seed_genres=None, limit=None)` — GET `/browse/recommendations`
-
-## `cache`
-
-- `stats(query=None)` — GET `/cache/stats`
-- `invalidate(key=None, pattern=None)` — POST `/cache/invalidate`
+- `recommendations(seed_tracks=None, seed_artists=None, seed_genres=None, limit=None, market=None)` — GET `/browse/recommendations`
 
 ## `charts`
 
 - `top_by_monthly_listeners(query=None)` (alias: `topByMonthlyListeners`) — GET `/top_20_by_monthly_listeners`
-- `top200_tracks(period=None, country=None, date=None)` (alias: `top200Tracks`) — GET `/top_200_tracks`
-- `top_artists(period=None, country=None)` (alias: `topArtists`) — GET `/top_artists`
-- `top_albums(period=None, country=None)` (alias: `topAlbums`) — GET `/top_albums`
-- `viral_tracks(country=None)` (alias: `viralTracks`) — GET `/viral_tracks`
+- `top200_tracks(period=None, country=None, date=None, city=None, include=None)` (alias: `top200Tracks`) — GET `/top_200_tracks`
+- `top_artists(period=None, country=None, date=None)` (alias: `topArtists`) — GET `/top_artists`
+- `top_albums(period=None, country=None, date=None)` (alias: `topAlbums`) — GET `/top_albums`
+- `viral_tracks(country=None, date=None, include=None)` (alias: `viralTracks`) — GET `/viral_tracks`
 - `top_by_followers(query=None)` (alias: `topByFollowers`) — GET `/top_20_by_followers`
 
 ## `concerts`
@@ -88,15 +84,10 @@ Pythonic `snake_case` methods also expose their npm-compatible `camelCase` alias
 - `by_artist(id, geo_hash=None, include_nearby=None, details=None, details_limit=None, parsed=None)` (alias: `byArtist`) — GET `/partner/artist-concerts`
 - `search_artists(query, geo_hash=None, include_nearby=None, limit=None, details=None, details_limit=None, parsed=None)` (alias: `searchArtists`) — GET `/partner/search-concert-artists`
 
-## `credentials`
-
-- `status(query=None)` — GET `/credentials/status`
-- `redis_cookies(query=None)` (alias: `redisCookies`) — GET `/cookies/redis`
-
 ## `downloads`
 
-- `track(q)` — GET `/download_track`
-- `soundcloud(q)` — GET `/download_track_sc`
+- `track(q, q_youtube=None, only_links=None, bypass_spotify=None, download_full_video=None, quality=None, extra_urls=None)` — GET `/download_track`
+- `soundcloud(q, only_links=None)` — GET `/download_track_sc`
 
 ## `episodes`
 
@@ -106,18 +97,16 @@ Pythonic `snake_case` methods also expose their npm-compatible `camelCase` alias
 ## `health`
 
 - `ping(query=None)` — GET `/ping`
+- `status()` — GET `/status`
 - `get(query=None)` — GET `/health`
 - `instance(query=None)` — GET `/health/instance`
 - `cluster(query=None)` — GET `/health/cluster`
 - `cluster_strict(query=None)` (alias: `clusterStrict`) — GET `/health/cluster/strict`
-- `proxies(query=None)` — GET `/health/proxies`
-- `clear_proxies(query=None, body=None)` (alias: `clearProxies`) — POST `/health/proxies/clear`
-- `clear_errors(query=None, body=None)` (alias: `clearErrors`) — POST `/health/clear-errors`
 
 ## `lookups`
 
 - `isrc(isrc)` — GET `/isrc_lookup`
-- `upc(upc)` — GET `/upc_lookup`
+- `upc(upc, market=None)` — GET `/upc_lookup`
 
 ## `markets`
 
@@ -126,22 +115,22 @@ Pythonic `snake_case` methods also expose their npm-compatible `camelCase` alias
 ## `partner`
 
 - `playlist(id, offset=None, limit=None)` — GET `/partner/playlist`
-- `track(id)` — GET `/partner/track`
+- `track(id, slim=None)` — GET `/partner/track`
 - `track_count(spotify_track_id=None, isrc=None)` (alias: `trackCount`) — GET `/partner/track/count`
 - `album(id, locale=None, offset=None, limit=None)` — GET `/partner/album`
-- `artist_overview(id, locale=None, include_prerelease=None)` (alias: `artistOverview`) — GET `/partner/artist-overview`
+- `artist_overview(id, locale=None, include_prerelease=None, slim=None)` (alias: `artistOverview`) — GET `/partner/artist-overview`
 - `artist_discography(id, offset=None, limit=None)` (alias: `artistDiscography`) — GET `/partner/artist-discography`
 
 ## `playlists`
 
-- `get(id)` — GET `/playlist`
-- `tracks(id, offset=None, limit=None)` — GET `/playlist_tracks`
+- `get(id, market=None)` — GET `/playlist`
+- `tracks(id, offset=None, limit=None, market=None, include=None)` — GET `/playlist_tracks`
 - `from_seed(uri)` (alias: `fromSeed`) — GET `/seed_to_playlist`
 
 ## `search`
 
-- `search(q, type=None, offset=None, limit=None, number_of_top_results=None, contrast=None)` — GET `/search`
-- `top_results(q, number_of_top_results=None, contrast=None)` (alias: `topResults`) — GET `/search_top_results`
+- `search(q, type=None, offset=None, limit=None, number_of_top_results=None, market=None, include_audiobooks=None, timeout=None, contrast=None, include=None)` — GET `/search`
+- `top_results(q, offset=None, limit=None, number_of_top_results=None, include_audiobooks=None, include_authors=None, include_pre_releases=None, contrast=None)` (alias: `topResults`) — GET `/search_top_results`
 - `lyrics(q, format=None)` — GET `/search_lyrics`
 - `suggestions(q, offset=None, limit=None, number_of_top_results=None, include_authors=None, debug=None, timeout=None, contrast=None)` — GET `/search_suggestions`
 - `multi_market(q, type=None, markets=None, limit=None)` (alias: `multiMarket`) — GET `/search_multi_market`
@@ -154,25 +143,28 @@ Pythonic `snake_case` methods also expose their npm-compatible `camelCase` alias
 
 ## `snapshots`
 
-- `list(id)` — GET `/playlist_snapshot`
+- `list(id, limit=None, offset=None, include_tracks=None)` — GET `/playlist_snapshot`
 - `create(id=None, webhook=None)` — POST `/playlist_snapshot`
 
 ## `tracking`
 
-- `track(type, id)` — POST `/tracking/track`
-- `untrack(type, id)` — DELETE `/tracking/untrack`
+- `track(spotify_type, spotify_id, label=None)` — POST `/tracking/track`
+- `untrack(spotify_type, spotify_id)` — DELETE `/tracking/untrack`
 - `items(offset=None, limit=None)` — GET `/tracking/items`
 - `item(spotify_type, spotify_id)` — GET `/tracking/items/{spotifyType}/{spotifyId}`
-- `logs(offset=None, limit=None)` — GET `/tracking/logs`
+- `logs(spotify_id=None, spotify_type=None, change_type=None, since=None, until=None, offset=None, limit=None)` — GET `/tracking/logs`
 - `stats(query=None)` — GET `/tracking/stats`
 - `health(query=None)` — GET `/tracking/health`
 
 ## `tracks`
 
-- `get(ids, contrast=None)` — GET `/tracks`
+- `get(ids, contrast=None, include=None)` — GET `/tracks`
+- `get_by_id(id, market=None, contrast=None)` (alias: `getById`) — GET `/tracks/{id}`
+- `counts(ids)` — GET `/partner/tracks/count`
+- `insights(ids)` — GET `/track_insights`
 - `credits(id)` — GET `/track_credits`
 - `lyrics(id, format=None, vocal_removal=None)` — GET `/track_lyrics`
-- `recommendations(limit=None, seed_tracks=None, seed_artists=None, seed_genres=None)` — GET `/recommendations`
+- `recommendations(limit=None, seed_tracks=None, seed_artists=None, seed_genres=None, market=None, include=None)` — GET `/recommendations`
 
 ## `users`
 
@@ -182,9 +174,9 @@ Pythonic `snake_case` methods also expose their npm-compatible `camelCase` alias
 ## `webhooks`
 
 - `get(query=None)` — GET `/webhooks`
-- `register(url=None, events=None)` — POST `/webhooks/register`
+- `register(playlist_id, callback_url, events=None, secret=None)` — POST `/webhooks/register`
 - `stats(query=None)` — GET `/webhooks/stats`
 - `delete(id)` — DELETE `/webhooks/{id}`
 - `test(id)` — POST `/webhooks/{id}/test`
-- `deliveries(id)` — GET `/webhooks/{id}/deliveries`
+- `deliveries(id, limit=None)` — GET `/webhooks/{id}/deliveries`
 

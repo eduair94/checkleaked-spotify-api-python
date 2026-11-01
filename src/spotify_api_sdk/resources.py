@@ -10,8 +10,8 @@ from typing import Any, Dict, Mapping, Optional, Sequence, Type
 from ._resource import Endpoint, Resource
 from .types import Headers, IdList, QueryParams
 
-ENDPOINT_COUNT = 110
-NAMESPACE_COUNT = 25
+ENDPOINT_COUNT = 108
+NAMESPACE_COUNT = 23
 
 _AI_HEALTH = Endpoint(
     key="ai.health",
@@ -135,7 +135,7 @@ _ALBUMS_GET = Endpoint(
     method="GET",
     path="/albums",
     path_fields=(),
-    query_fields=(("ids", "ids"), ("contrast", "contrast")),
+    query_fields=(("ids", "ids"), ("market", "market"), ("contrast", "contrast"), ("include", "include")),
     body_fields=(),
 )
 
@@ -171,7 +171,7 @@ _ANALYSIS_AUDIO_FEATURES = Endpoint(
     method="GET",
     path="/audio_features",
     path_fields=(),
-    query_fields=(("id", "id"),),
+    query_fields=(("ids", "ids"),),
     body_fields=(),
 )
 
@@ -189,7 +189,16 @@ _ARTISTS_GET = Endpoint(
     method="GET",
     path="/artists",
     path_fields=(),
-    query_fields=(("ids", "ids"), ("contrast", "contrast")),
+    query_fields=(("ids", "ids"), ("market", "market"), ("contrast", "contrast"), ("include", "include")),
+    body_fields=(),
+)
+
+_ARTISTS_INSIGHTS = Endpoint(
+    key="artists.insights",
+    method="GET",
+    path="/artist_insights",
+    path_fields=(),
+    query_fields=(("ids", "ids"),),
     body_fields=(),
 )
 
@@ -198,7 +207,7 @@ _ARTISTS_OVERVIEW = Endpoint(
     method="GET",
     path="/artist_overview",
     path_fields=(),
-    query_fields=(("id", "id"), ("contrast", "contrast")),
+    query_fields=(("id", "id"), ("slim", "slim"), ("contrast", "contrast"), ("include", "include")),
     body_fields=(),
 )
 
@@ -333,7 +342,7 @@ _BATCH_TRACK_LYRICS = Endpoint(
     method="GET",
     path="/track_lyrics_batch",
     path_fields=(),
-    query_fields=(("ids", "ids"), ("format", "format")),
+    query_fields=(("ids", "ids"), ("format", "format"), ("vocal_removal", "vocalRemoval")),
     body_fields=(),
 )
 
@@ -360,7 +369,7 @@ _BROWSE_CATEGORY = Endpoint(
     method="GET",
     path="/browse/categories/{id}",
     path_fields=(("id", "id"),),
-    query_fields=(("country", "country"), ("locale", "locale")),
+    query_fields=(("country", "country"), ("locale", "locale"), ("section_limit", "section_limit"), ("section_offset", "section_offset"), ("item_limit", "item_limit"), ("item_offset", "item_offset")),
     body_fields=(),
 )
 
@@ -369,7 +378,7 @@ _BROWSE_FEATURED_PLAYLISTS = Endpoint(
     method="GET",
     path="/browse/featured-playlists",
     path_fields=(),
-    query_fields=(("country", "country"), ("locale", "locale"), ("limit", "limit"), ("offset", "offset")),
+    query_fields=(("country", "country"), ("locale", "locale"), ("timestamp", "timestamp"), ("limit", "limit"), ("offset", "offset")),
     body_fields=(),
 )
 
@@ -387,26 +396,8 @@ _BROWSE_RECOMMENDATIONS = Endpoint(
     method="GET",
     path="/browse/recommendations",
     path_fields=(),
-    query_fields=(("seed_tracks", "seed_tracks"), ("seed_artists", "seed_artists"), ("seed_genres", "seed_genres"), ("limit", "limit")),
+    query_fields=(("seed_tracks", "seed_tracks"), ("seed_artists", "seed_artists"), ("seed_genres", "seed_genres"), ("limit", "limit"), ("market", "market")),
     body_fields=(),
-)
-
-_CACHE_STATS = Endpoint(
-    key="cache.stats",
-    method="GET",
-    path="/cache/stats",
-    path_fields=(),
-    query_fields=(),
-    body_fields=(),
-)
-
-_CACHE_INVALIDATE = Endpoint(
-    key="cache.invalidate",
-    method="POST",
-    path="/cache/invalidate",
-    path_fields=(),
-    query_fields=(),
-    body_fields=(("key", "key"), ("pattern", "pattern")),
 )
 
 _CHARTS_TOP_BY_MONTHLY_LISTENERS = Endpoint(
@@ -423,7 +414,7 @@ _CHARTS_TOP200_TRACKS = Endpoint(
     method="GET",
     path="/top_200_tracks",
     path_fields=(),
-    query_fields=(("period", "period"), ("country", "country"), ("date", "date")),
+    query_fields=(("period", "period"), ("country", "country"), ("date", "date"), ("city", "city"), ("include", "include")),
     body_fields=(),
 )
 
@@ -432,7 +423,7 @@ _CHARTS_TOP_ARTISTS = Endpoint(
     method="GET",
     path="/top_artists",
     path_fields=(),
-    query_fields=(("period", "period"), ("country", "country")),
+    query_fields=(("period", "period"), ("country", "country"), ("date", "date")),
     body_fields=(),
 )
 
@@ -441,7 +432,7 @@ _CHARTS_TOP_ALBUMS = Endpoint(
     method="GET",
     path="/top_albums",
     path_fields=(),
-    query_fields=(("period", "period"), ("country", "country")),
+    query_fields=(("period", "period"), ("country", "country"), ("date", "date")),
     body_fields=(),
 )
 
@@ -450,7 +441,7 @@ _CHARTS_VIRAL_TRACKS = Endpoint(
     method="GET",
     path="/viral_tracks",
     path_fields=(),
-    query_fields=(("country", "country"),),
+    query_fields=(("country", "country"), ("date", "date"), ("include", "include")),
     body_fields=(),
 )
 
@@ -508,30 +499,12 @@ _CONCERTS_SEARCH_ARTISTS = Endpoint(
     body_fields=(),
 )
 
-_CREDENTIALS_STATUS = Endpoint(
-    key="credentials.status",
-    method="GET",
-    path="/credentials/status",
-    path_fields=(),
-    query_fields=(),
-    body_fields=(),
-)
-
-_CREDENTIALS_REDIS_COOKIES = Endpoint(
-    key="credentials.redisCookies",
-    method="GET",
-    path="/cookies/redis",
-    path_fields=(),
-    query_fields=(),
-    body_fields=(),
-)
-
 _DOWNLOADS_TRACK = Endpoint(
     key="downloads.track",
     method="GET",
     path="/download_track",
     path_fields=(),
-    query_fields=(("q", "q"),),
+    query_fields=(("q", "q"), ("q_youtube", "q_youtube"), ("only_links", "onlyLinks"), ("bypass_spotify", "bypassSpotify"), ("download_full_video", "downloadFullVideo"), ("quality", "quality"), ("extra_urls", "extraUrls")),
     body_fields=(),
 )
 
@@ -540,7 +513,7 @@ _DOWNLOADS_SOUNDCLOUD = Endpoint(
     method="GET",
     path="/download_track_sc",
     path_fields=(),
-    query_fields=(("q", "q"),),
+    query_fields=(("q", "q"), ("only_links", "onlyLinks")),
     body_fields=(),
 )
 
@@ -566,6 +539,15 @@ _HEALTH_PING = Endpoint(
     key="health.ping",
     method="GET",
     path="/ping",
+    path_fields=(),
+    query_fields=(),
+    body_fields=(),
+)
+
+_HEALTH_STATUS = Endpoint(
+    key="health.status",
+    method="GET",
+    path="/status",
     path_fields=(),
     query_fields=(),
     body_fields=(),
@@ -607,33 +589,6 @@ _HEALTH_CLUSTER_STRICT = Endpoint(
     body_fields=(),
 )
 
-_HEALTH_PROXIES = Endpoint(
-    key="health.proxies",
-    method="GET",
-    path="/health/proxies",
-    path_fields=(),
-    query_fields=(),
-    body_fields=(),
-)
-
-_HEALTH_CLEAR_PROXIES = Endpoint(
-    key="health.clearProxies",
-    method="POST",
-    path="/health/proxies/clear",
-    path_fields=(),
-    query_fields=(),
-    body_fields=(),
-)
-
-_HEALTH_CLEAR_ERRORS = Endpoint(
-    key="health.clearErrors",
-    method="POST",
-    path="/health/clear-errors",
-    path_fields=(),
-    query_fields=(),
-    body_fields=(),
-)
-
 _LOOKUPS_ISRC = Endpoint(
     key="lookups.isrc",
     method="GET",
@@ -648,7 +603,7 @@ _LOOKUPS_UPC = Endpoint(
     method="GET",
     path="/upc_lookup",
     path_fields=(),
-    query_fields=(("upc", "upc"),),
+    query_fields=(("upc", "upc"), ("market", "market")),
     body_fields=(),
 )
 
@@ -675,7 +630,7 @@ _PARTNER_TRACK = Endpoint(
     method="GET",
     path="/partner/track",
     path_fields=(),
-    query_fields=(("id", "id"),),
+    query_fields=(("id", "id"), ("slim", "slim")),
     body_fields=(),
 )
 
@@ -702,7 +657,7 @@ _PARTNER_ARTIST_OVERVIEW = Endpoint(
     method="GET",
     path="/partner/artist-overview",
     path_fields=(),
-    query_fields=(("id", "id"), ("locale", "locale"), ("include_prerelease", "includePrerelease")),
+    query_fields=(("id", "id"), ("locale", "locale"), ("include_prerelease", "includePrerelease"), ("slim", "slim")),
     body_fields=(),
 )
 
@@ -720,7 +675,7 @@ _PLAYLISTS_GET = Endpoint(
     method="GET",
     path="/playlist",
     path_fields=(),
-    query_fields=(("id", "id"),),
+    query_fields=(("id", "id"), ("market", "market")),
     body_fields=(),
 )
 
@@ -729,7 +684,7 @@ _PLAYLISTS_TRACKS = Endpoint(
     method="GET",
     path="/playlist_tracks",
     path_fields=(),
-    query_fields=(("id", "id"), ("offset", "offset"), ("limit", "limit")),
+    query_fields=(("id", "id"), ("offset", "offset"), ("limit", "limit"), ("market", "market"), ("include", "include")),
     body_fields=(),
 )
 
@@ -747,7 +702,7 @@ _SEARCH_SEARCH = Endpoint(
     method="GET",
     path="/search",
     path_fields=(),
-    query_fields=(("q", "q"), ("type", "type"), ("offset", "offset"), ("limit", "limit"), ("number_of_top_results", "numberOfTopResults"), ("contrast", "contrast")),
+    query_fields=(("q", "q"), ("type", "type"), ("offset", "offset"), ("limit", "limit"), ("number_of_top_results", "numberOfTopResults"), ("market", "market"), ("include_audiobooks", "includeAudiobooks"), ("timeout", "timeout"), ("contrast", "contrast"), ("include", "include")),
     body_fields=(),
 )
 
@@ -756,7 +711,7 @@ _SEARCH_TOP_RESULTS = Endpoint(
     method="GET",
     path="/search_top_results",
     path_fields=(),
-    query_fields=(("q", "q"), ("number_of_top_results", "numberOfTopResults"), ("contrast", "contrast")),
+    query_fields=(("q", "q"), ("offset", "offset"), ("limit", "limit"), ("number_of_top_results", "numberOfTopResults"), ("include_audiobooks", "includeAudiobooks"), ("include_authors", "includeAuthors"), ("include_pre_releases", "includePreReleases"), ("contrast", "contrast")),
     body_fields=(),
 )
 
@@ -819,7 +774,7 @@ _SNAPSHOTS_LIST = Endpoint(
     method="GET",
     path="/playlist_snapshot",
     path_fields=(),
-    query_fields=(("id", "id"),),
+    query_fields=(("id", "id"), ("limit", "limit"), ("offset", "offset"), ("include_tracks", "include_tracks")),
     body_fields=(),
 )
 
@@ -828,8 +783,8 @@ _SNAPSHOTS_CREATE = Endpoint(
     method="POST",
     path="/playlist_snapshot",
     path_fields=(),
-    query_fields=(),
-    body_fields=(("id", "id"), ("webhook", "webhook")),
+    query_fields=(("webhook", "webhook"),),
+    body_fields=(("id", "id"),),
 )
 
 _TRACKING_TRACK = Endpoint(
@@ -838,7 +793,7 @@ _TRACKING_TRACK = Endpoint(
     path="/tracking/track",
     path_fields=(),
     query_fields=(),
-    body_fields=(("type", "type"), ("id", "id")),
+    body_fields=(("spotify_type", "spotifyType"), ("spotify_id", "spotifyId"), ("label", "label")),
 )
 
 _TRACKING_UNTRACK = Endpoint(
@@ -846,7 +801,7 @@ _TRACKING_UNTRACK = Endpoint(
     method="DELETE",
     path="/tracking/untrack",
     path_fields=(),
-    query_fields=(("type", "type"), ("id", "id")),
+    query_fields=(("spotify_type", "spotifyType"), ("spotify_id", "spotifyId")),
     body_fields=(),
 )
 
@@ -873,7 +828,7 @@ _TRACKING_LOGS = Endpoint(
     method="GET",
     path="/tracking/logs",
     path_fields=(),
-    query_fields=(("offset", "offset"), ("limit", "limit")),
+    query_fields=(("spotify_id", "spotifyId"), ("spotify_type", "spotifyType"), ("change_type", "changeType"), ("since", "since"), ("until", "until"), ("offset", "offset"), ("limit", "limit")),
     body_fields=(),
 )
 
@@ -900,7 +855,34 @@ _TRACKS_GET = Endpoint(
     method="GET",
     path="/tracks",
     path_fields=(),
-    query_fields=(("ids", "ids"), ("contrast", "contrast")),
+    query_fields=(("ids", "ids"), ("contrast", "contrast"), ("include", "include")),
+    body_fields=(),
+)
+
+_TRACKS_GET_BY_ID = Endpoint(
+    key="tracks.getById",
+    method="GET",
+    path="/tracks/{id}",
+    path_fields=(("id", "id"),),
+    query_fields=(("market", "market"), ("contrast", "contrast")),
+    body_fields=(),
+)
+
+_TRACKS_COUNTS = Endpoint(
+    key="tracks.counts",
+    method="GET",
+    path="/partner/tracks/count",
+    path_fields=(),
+    query_fields=(("ids", "ids"),),
+    body_fields=(),
+)
+
+_TRACKS_INSIGHTS = Endpoint(
+    key="tracks.insights",
+    method="GET",
+    path="/track_insights",
+    path_fields=(),
+    query_fields=(("ids", "ids"),),
     body_fields=(),
 )
 
@@ -927,7 +909,7 @@ _TRACKS_RECOMMENDATIONS = Endpoint(
     method="GET",
     path="/recommendations",
     path_fields=(),
-    query_fields=(("limit", "limit"), ("seed_tracks", "seed_tracks"), ("seed_artists", "seed_artists"), ("seed_genres", "seed_genres")),
+    query_fields=(("limit", "limit"), ("seed_tracks", "seed_tracks"), ("seed_artists", "seed_artists"), ("seed_genres", "seed_genres"), ("market", "market"), ("include", "include")),
     body_fields=(),
 )
 
@@ -964,7 +946,7 @@ _WEBHOOKS_REGISTER = Endpoint(
     path="/webhooks/register",
     path_fields=(),
     query_fields=(),
-    body_fields=(("url", "url"), ("events", "events")),
+    body_fields=(("playlist_id", "playlistId"), ("callback_url", "callbackUrl"), ("events", "events"), ("secret", "secret")),
 )
 
 _WEBHOOKS_STATS = Endpoint(
@@ -999,7 +981,7 @@ _WEBHOOKS_DELIVERIES = Endpoint(
     method="GET",
     path="/webhooks/{id}/deliveries",
     path_fields=(("id", "id"),),
-    query_fields=(),
+    query_fields=(("limit", "limit"),),
     body_fields=(),
 )
 
@@ -1186,7 +1168,9 @@ class AlbumsResource(Resource):
         self,
         ids: IdList,
         *,
+        market: Optional[str] = None,
         contrast: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1242,7 +1226,7 @@ class AnalysisResource(Resource):
 
     def audio_features(
         self,
-        id: str,
+        ids: IdList,
         *,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
@@ -1276,7 +1260,9 @@ class ArtistsResource(Resource):
         self,
         ids: IdList,
         *,
+        market: Optional[str] = None,
         contrast: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1285,11 +1271,25 @@ class ArtistsResource(Resource):
         """GET /artists."""
         return self._invoke(_ARTISTS_GET, locals())
 
+    def insights(
+        self,
+        ids: IdList,
+        *,
+        extra_query: Optional[QueryParams] = None,
+        request_timeout: Optional[float] = None,
+        request_retries: Optional[int] = None,
+        request_headers: Optional[Headers] = None,
+    ) -> Any:
+        """GET /artist_insights."""
+        return self._invoke(_ARTISTS_INSIGHTS, locals())
+
     def overview(
         self,
         id: str,
         *,
+        slim: Optional[bool] = None,
         contrast: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1504,6 +1504,7 @@ class BatchResource(Resource):
         ids: IdList,
         *,
         format: Optional[str] = None,
+        vocal_removal: Optional[bool] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1553,6 +1554,10 @@ class BrowseResource(Resource):
         *,
         country: Optional[str] = None,
         locale: Optional[str] = None,
+        section_limit: Optional[int] = None,
+        section_offset: Optional[int] = None,
+        item_limit: Optional[int] = None,
+        item_offset: Optional[int] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1566,6 +1571,7 @@ class BrowseResource(Resource):
         *,
         country: Optional[str] = None,
         locale: Optional[str] = None,
+        timestamp: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         extra_query: Optional[QueryParams] = None,
@@ -1601,6 +1607,7 @@ class BrowseResource(Resource):
         seed_artists: Optional[Sequence[str]] = None,
         seed_genres: Optional[str] = None,
         limit: Optional[int] = None,
+        market: Optional[str] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1608,35 +1615,6 @@ class BrowseResource(Resource):
     ) -> Any:
         """GET /browse/recommendations."""
         return self._invoke(_BROWSE_RECOMMENDATIONS, locals())
-
-
-class CacheResource(Resource):
-    """cache endpoints."""
-
-    def stats(
-        self,
-        query: Optional[QueryParams] = None,
-        *,
-        request_timeout: Optional[float] = None,
-        request_retries: Optional[int] = None,
-        request_headers: Optional[Headers] = None,
-    ) -> Any:
-        """GET /cache/stats."""
-        return self._invoke(_CACHE_STATS, locals())
-
-    def invalidate(
-        self,
-        *,
-        key: Optional[str] = None,
-        pattern: Optional[str] = None,
-        extra_query: Optional[QueryParams] = None,
-        body: Optional[Mapping[str, Any]] = None,
-        request_timeout: Optional[float] = None,
-        request_retries: Optional[int] = None,
-        request_headers: Optional[Headers] = None,
-    ) -> Any:
-        """POST /cache/invalidate."""
-        return self._invoke(_CACHE_INVALIDATE, locals())
 
 
 class ChartsResource(Resource):
@@ -1661,6 +1639,8 @@ class ChartsResource(Resource):
         period: Optional[str] = None,
         country: Optional[str] = None,
         date: Optional[str] = None,
+        city: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1676,6 +1656,7 @@ class ChartsResource(Resource):
         *,
         period: Optional[str] = None,
         country: Optional[str] = None,
+        date: Optional[str] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1691,6 +1672,7 @@ class ChartsResource(Resource):
         *,
         period: Optional[str] = None,
         country: Optional[str] = None,
+        date: Optional[str] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1705,6 +1687,8 @@ class ChartsResource(Resource):
         self,
         *,
         country: Optional[str] = None,
+        date: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1819,34 +1803,6 @@ class ConcertsResource(Resource):
     searchArtists = search_artists
 
 
-class CredentialsResource(Resource):
-    """credentials endpoints."""
-
-    def status(
-        self,
-        query: Optional[QueryParams] = None,
-        *,
-        request_timeout: Optional[float] = None,
-        request_retries: Optional[int] = None,
-        request_headers: Optional[Headers] = None,
-    ) -> Any:
-        """GET /credentials/status."""
-        return self._invoke(_CREDENTIALS_STATUS, locals())
-
-    def redis_cookies(
-        self,
-        query: Optional[QueryParams] = None,
-        *,
-        request_timeout: Optional[float] = None,
-        request_retries: Optional[int] = None,
-        request_headers: Optional[Headers] = None,
-    ) -> Any:
-        """GET /cookies/redis."""
-        return self._invoke(_CREDENTIALS_REDIS_COOKIES, locals())
-
-    redisCookies = redis_cookies
-
-
 class DownloadsResource(Resource):
     """downloads endpoints."""
 
@@ -1854,6 +1810,12 @@ class DownloadsResource(Resource):
         self,
         q: str,
         *,
+        q_youtube: Optional[str] = None,
+        only_links: Optional[bool] = None,
+        bypass_spotify: Optional[bool] = None,
+        download_full_video: Optional[bool] = None,
+        quality: Optional[str] = None,
+        extra_urls: Optional[bool] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1866,6 +1828,7 @@ class DownloadsResource(Resource):
         self,
         q: str,
         *,
+        only_links: Optional[bool] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -1921,6 +1884,17 @@ class HealthResource(Resource):
         """GET /ping."""
         return self._invoke(_HEALTH_PING, locals())
 
+    def status(
+        self,
+        *,
+        extra_query: Optional[QueryParams] = None,
+        request_timeout: Optional[float] = None,
+        request_retries: Optional[int] = None,
+        request_headers: Optional[Headers] = None,
+    ) -> Any:
+        """GET /status."""
+        return self._invoke(_HEALTH_STATUS, locals())
+
     def get(
         self,
         query: Optional[QueryParams] = None,
@@ -1967,45 +1941,6 @@ class HealthResource(Resource):
 
     clusterStrict = cluster_strict
 
-    def proxies(
-        self,
-        query: Optional[QueryParams] = None,
-        *,
-        request_timeout: Optional[float] = None,
-        request_retries: Optional[int] = None,
-        request_headers: Optional[Headers] = None,
-    ) -> Any:
-        """GET /health/proxies."""
-        return self._invoke(_HEALTH_PROXIES, locals())
-
-    def clear_proxies(
-        self,
-        body: Any = None,
-        *,
-        query: Optional[QueryParams] = None,
-        request_timeout: Optional[float] = None,
-        request_retries: Optional[int] = None,
-        request_headers: Optional[Headers] = None,
-    ) -> Any:
-        """POST /health/proxies/clear."""
-        return self._invoke(_HEALTH_CLEAR_PROXIES, locals())
-
-    clearProxies = clear_proxies
-
-    def clear_errors(
-        self,
-        body: Any = None,
-        *,
-        query: Optional[QueryParams] = None,
-        request_timeout: Optional[float] = None,
-        request_retries: Optional[int] = None,
-        request_headers: Optional[Headers] = None,
-    ) -> Any:
-        """POST /health/clear-errors."""
-        return self._invoke(_HEALTH_CLEAR_ERRORS, locals())
-
-    clearErrors = clear_errors
-
 
 class LookupsResource(Resource):
     """lookups endpoints."""
@@ -2026,6 +1961,7 @@ class LookupsResource(Resource):
         self,
         upc: str,
         *,
+        market: Optional[str] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2071,6 +2007,7 @@ class PartnerResource(Resource):
         self,
         id: str,
         *,
+        slim: Optional[bool] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2115,6 +2052,7 @@ class PartnerResource(Resource):
         *,
         locale: Optional[str] = None,
         include_prerelease: Optional[bool] = None,
+        slim: Optional[bool] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2149,6 +2087,7 @@ class PlaylistsResource(Resource):
         self,
         id: str,
         *,
+        market: Optional[str] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2163,6 +2102,8 @@ class PlaylistsResource(Resource):
         *,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
+        market: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2197,7 +2138,11 @@ class SearchResource(Resource):
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         number_of_top_results: Optional[int] = None,
+        market: Optional[str] = None,
+        include_audiobooks: Optional[bool] = None,
+        timeout: Optional[int] = None,
         contrast: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2210,7 +2155,12 @@ class SearchResource(Resource):
         self,
         q: str,
         *,
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
         number_of_top_results: Optional[int] = None,
+        include_audiobooks: Optional[bool] = None,
+        include_authors: Optional[bool] = None,
+        include_pre_releases: Optional[bool] = None,
         contrast: Optional[str] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
@@ -2325,6 +2275,9 @@ class SnapshotsResource(Resource):
         self,
         id: str,
         *,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        include_tracks: Optional[bool] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2353,9 +2306,10 @@ class TrackingResource(Resource):
 
     def track(
         self,
-        type: str,
-        id: str,
+        spotify_type: str,
+        spotify_id: str,
         *,
+        label: Optional[str] = None,
         extra_query: Optional[QueryParams] = None,
         body: Optional[Mapping[str, Any]] = None,
         request_timeout: Optional[float] = None,
@@ -2367,8 +2321,8 @@ class TrackingResource(Resource):
 
     def untrack(
         self,
-        type: str,
-        id: str,
+        spotify_type: str,
+        spotify_id: str,
         *,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
@@ -2407,6 +2361,11 @@ class TrackingResource(Resource):
     def logs(
         self,
         *,
+        spotify_id: Optional[str] = None,
+        spotify_type: Optional[str] = None,
+        change_type: Optional[str] = None,
+        since: Optional[str] = None,
+        until: Optional[str] = None,
         offset: Optional[int] = None,
         limit: Optional[int] = None,
         extra_query: Optional[QueryParams] = None,
@@ -2448,6 +2407,7 @@ class TracksResource(Resource):
         ids: IdList,
         *,
         contrast: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2455,6 +2415,46 @@ class TracksResource(Resource):
     ) -> Any:
         """GET /tracks."""
         return self._invoke(_TRACKS_GET, locals())
+
+    def get_by_id(
+        self,
+        id: str,
+        *,
+        market: Optional[str] = None,
+        contrast: Optional[str] = None,
+        extra_query: Optional[QueryParams] = None,
+        request_timeout: Optional[float] = None,
+        request_retries: Optional[int] = None,
+        request_headers: Optional[Headers] = None,
+    ) -> Any:
+        """GET /tracks/{id}."""
+        return self._invoke(_TRACKS_GET_BY_ID, locals())
+
+    getById = get_by_id
+
+    def counts(
+        self,
+        ids: IdList,
+        *,
+        extra_query: Optional[QueryParams] = None,
+        request_timeout: Optional[float] = None,
+        request_retries: Optional[int] = None,
+        request_headers: Optional[Headers] = None,
+    ) -> Any:
+        """GET /partner/tracks/count."""
+        return self._invoke(_TRACKS_COUNTS, locals())
+
+    def insights(
+        self,
+        ids: IdList,
+        *,
+        extra_query: Optional[QueryParams] = None,
+        request_timeout: Optional[float] = None,
+        request_retries: Optional[int] = None,
+        request_headers: Optional[Headers] = None,
+    ) -> Any:
+        """GET /track_insights."""
+        return self._invoke(_TRACKS_INSIGHTS, locals())
 
     def credits(
         self,
@@ -2489,6 +2489,8 @@ class TracksResource(Resource):
         seed_tracks: Optional[Sequence[str]] = None,
         seed_artists: Optional[Sequence[str]] = None,
         seed_genres: Optional[str] = None,
+        market: Optional[str] = None,
+        include: Optional[Sequence[str]] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2545,9 +2547,11 @@ class WebhooksResource(Resource):
 
     def register(
         self,
+        playlist_id: str,
+        callback_url: str,
         *,
-        url: Optional[str] = None,
         events: Optional[Sequence[str]] = None,
+        secret: Optional[str] = None,
         extra_query: Optional[QueryParams] = None,
         body: Optional[Mapping[str, Any]] = None,
         request_timeout: Optional[float] = None,
@@ -2597,6 +2601,7 @@ class WebhooksResource(Resource):
         self,
         id: str,
         *,
+        limit: Optional[int] = None,
         extra_query: Optional[QueryParams] = None,
         request_timeout: Optional[float] = None,
         request_retries: Optional[int] = None,
@@ -2616,10 +2621,8 @@ class ClientResources:
     audiobooks: AudiobooksResource
     batch: BatchResource
     browse: BrowseResource
-    cache: CacheResource
     charts: ChartsResource
     concerts: ConcertsResource
-    credentials: CredentialsResource
     downloads: DownloadsResource
     episodes: EpisodesResource
     health: HealthResource
@@ -2644,10 +2647,8 @@ RESOURCE_CLASSES: Dict[str, Type[Resource]] = {
     "audiobooks": AudiobooksResource,
     "batch": BatchResource,
     "browse": BrowseResource,
-    "cache": CacheResource,
     "charts": ChartsResource,
     "concerts": ConcertsResource,
-    "credentials": CredentialsResource,
     "downloads": DownloadsResource,
     "episodes": EpisodesResource,
     "health": HealthResource,

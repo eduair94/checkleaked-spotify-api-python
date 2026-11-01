@@ -291,9 +291,14 @@ const resources = fs.readdirSync(resourcesDir)
   .map(parseResource);
 
 const methods = resources.flatMap((resource) => resource.methods);
-if (resources.length !== 25 || methods.length !== 110) {
+// 2.0.0: the operator-only cache/credentials namespaces and health admin methods are gone;
+// health.status, tracks.getById and tracks.counts are new. 2.1.0: tracks.insights, artists.insights.
+const EXPECTED_NAMESPACES = 23;
+const EXPECTED_METHODS = 108;
+if (resources.length !== EXPECTED_NAMESPACES || methods.length !== EXPECTED_METHODS) {
   throw new Error(
-    `Expected 25 namespaces / 110 methods, got ${resources.length} / ${methods.length}`,
+    `Expected ${EXPECTED_NAMESPACES} namespaces / ${EXPECTED_METHODS} methods, `
+    + `got ${resources.length} / ${methods.length}`,
   );
 }
 

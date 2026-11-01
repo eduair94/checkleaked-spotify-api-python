@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "checkleaked-spotify-api"
-version = "1.0.0"
+version = "2.1.0"
 description = "Typed Python SDK for the CheckLeaked Spotify Data API and RapidAPI spotify81."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -48,11 +48,13 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://spotify-proxy.checkleaked.cc"
+Homepage = "https://spotify.checkleaked.cc"
 Documentation = "https://spotify-proxy.checkleaked.cc/docs"
 Repository = "https://github.com/eduair94/checkleaked-spotify-api-python"
 Issues = "https://github.com/eduair94/checkleaked-spotify-api-python/issues"
 OpenAPI = "https://spotify-proxy.checkleaked.cc/openapi.json"
+Status = "https://spotify.checkleaked.cc/status"
+Changelog = "https://github.com/eduair94/checkleaked-spotify-api-python/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/spotify_api_sdk"]
